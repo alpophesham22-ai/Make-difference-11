@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Subscription Manager — Dark</title>
+<meta name="theme-color" content="#0f1724"/>
+<style>
+  :root{
+    --bg:#0b1220; --card:#0f1724; --muted:#9aa4b2;
+    --accent:#0ea5a4; --danger:#ef4444; --surface:#0b1228;
+    --soft:#111827;
+  }
+  *{box-sizing:border-box}
+  body{font-family:Inter,ui-sans-serif,system-ui, -apple-system,"Segoe UI",Roboto, "Helvetica Neue",Arial; margin:0; color:#e6eef6; background:linear-gradient(180deg,#05060a 0%, #07101b 100%); -webkit-font-smoothing:antialiased}
+  header{background:linear-gradient(90deg,#06202a,#072d3a); padding:16px; text-align:center; box-shadow:0 2px 12px rgba(0,0,0,0.6)}
+  header h1{margin:0;font-size:18px}
+  main{max-width:1100px;margin:18px auto;padding:12px}
+  nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:#071425;border-top:1px solid rgba(255,255,255,0.03)}
+  nav button{flex:1;padding:12px;border:0;background:transparent;color:var(--muted);font-weight:600;cursor:pointer}
+  nav button.active{color:var(--accent); border-top:3px solid rgba(14,165,164,0.12)}
+  .page{display:none}
+  .active{display:block}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:14px;border-radius:10px; border:1px solid rgba(255,255,255,0.03); box-shadow:0 6px 30px rgba(2,6,23,0.6); margin-bottom:14px}
+  h2{margin:6px 0 12px 0}
+  label{display:block;font-size:13px;color:var(--muted); margin-top:8px}
+  input[type="text"], input[type="tel"], input[type="date"], input[type="number"], select, textarea {
+    width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid rgba(255,255,255,0.04);
+    background:#07101a; color:#e6eef6; outline:none;
+  }
+  input[type=file]{color:var(--muted)}
+  .row{display:flex;gap:10px}
+  .col{flex:1}
+  .topbar{display:flex;gap:10px;align-items:center}
+  .small{font-size:13px;color:var(--muted)}
+  .muted{color:var(--muted)}
+  .btn{background:var(--accent);color:#021018;border:0;padding:10px 12px;border-radius:8px;cursor:pointer}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.03); color:var(--muted)}
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  th,td{padding:10px;border-bottom:1px dashed rgba(255,255,255,0.03); text-align:left; font-size:14px}
+  th{color:#cdebe9; font-weight:700; background:transparent}
+  .info{background:linear-gradient(90deg, rgba(14,165,164,0.06), rgba(14,165,164,0.02)); padding:10px; border-radius:8px; color:#bfe9e6; margin-top:10px}
+  .alert{background:rgba(239,68,68,0.08); color:#ffb4b4; padding:8px; border-radius:6px; margin-bottom:8px}
+  footer.note{margin-top:12px;color:var(--muted);font-size:13px;text-align:center}
+  .hidden{display:none}
+  .controls{display:flex;gap:8px; margin-top:8px}
+  .kbd{background:rgba(255,255,255,0.02);padding:6px 8px;border-radius:6px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<header><h1>Subscription Manager — Dark (Offline PWA)</h1></header>
+
+<main>
+  <!-- ADD SUBSCRIBER -->
+  <section id="page-add" class="page active">
+    <div class="card">
+      <h2>Add Subscriber</h2>
+      <form id="form-add">
+        <div class="row">
+          <div class="col">
+            <label>Full name</label>
+            <input id="add_name" type="text" placeholder="John Doe" required>
+          </div>
+          <div class="col">
+            <label>Subscriber ID</label>
+            <input id="add_id" type="text" placeholder="ID123" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label>Phone</label>
+            <input id="add_phone" type="tel" placeholder="+9665...">
+          </div>
+          <div class="col">
+            <label>Plan name</label>
+            <input id="add_plan" type="text" placeholder="Standard">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label>Duration</label>
+            <select id="add_duration"><option value="14">14 days</option><option value="40">40 days</option></select>
+          </div>
+          <div class="col">
+            <label>Start date</label>
+            <input id="add_start" type="date">
+          </div>
+        </div>
+
+        <h3 class="small">Meals available (per type)</h3>
+        <div class="row">
+          <div class="col"><label>Chicken</label><input id="add_chicken" type="number" min="0" value="0"></div>
+          <div class="col"><label>Beef</label><input id="add_beef" type="number" min="0" value="0"></div>
+          <div class="col"><label>Fish</label><input id="add_fish" type="number" min="0" value="0"></div>
+        </div>
+        <div class="row">
+          <div class="col"><label>Snack</label><input id="add_snack" type="number" min="0" value="0"></div>
+          <div class="col"><label>Other</label><input id="add_other" type="number" min="0" value="0"></div>
+          <div class="col"><label>Protein (g)</label><input id="add_protein" type="number" min="0" value="0"></div>
+        </div>
+
+        <div class="controls">
+          <button class="btn" type="submit">Add subscriber</button>
+          <button class="btn ghost" id="btn-add-reset" type="button">Reset</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- EDIT / SEARCH / CONSUMPTION (single consolidated page) -->
+  <section id="page-edit-consume" class="page">
+    <div class="card">
+      <h2>Find Subscriber — Edit & Record Consumption</h2>
+
+      <div class="topbar">
+        <input id="search_q" type="text" placeholder="Type name, phone or ID to search" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:#08111a;color:#eaf8f7">
+        <button class="btn" id="btn-search">Search</button>
+      </div>
+
+      <div id="found_box" class="hidden">
+        <div id="found_info" class="info" style="margin-top:12px"></div>
+
+        <form id="form-edit" style="margin-top:12px">
+          <input id="edit_key" type="hidden">
+
+          <div class="row">
+            <div class="col"><label>Full name</label><input id="edit_name" type="text"></div>
+            <div class="col"><label>Subscriber ID</label><input id="edit_id" type="text"></div>
+          </div>
+
+          <div class="row">
+            <div class="col"><label>Phone</label><input id="edit_phone" type="tel"></div>
+            <div class="col"><label>Plan name</label><input id="edit_plan" type="text"></div>
+          </div>
+
+          <div class="row">
+            <div class="col"><label>Duration</label><select id="edit_duration"><option value="14">14 days</option><option value="40">40 days</option></select></div>
+            <div class="col"><label>Start date</label><input id="edit_start" type="date"></div>
+          </div>
+
+          <h3 class="small">Available meals (edit if needed)</h3>
+          <div class="row">
+            <div class="col"><label>Chicken</label><input id="edit_chicken" type="number" min="0"></div>
+            <div class="col"><label>Beef</label><input id="edit_beef" type="number" min="0"></div>
+            <div class="col"><label>Fish</label><input id="edit_fish" type="number" min="0"></div>
+          </div>
+          <div class="row">
+            <div class="col"><label>Snack</label><input id="edit_snack" type="number" min="0"></div>
+            <div class="col"><label>Other</label><input id="edit_other" type="number" min="0"></div>
+            <div class="col"><label>Protein (g)</label><input id="edit_protein" type="number" min="0"></div>
+          </div>
+
+          <div class="controls">
+            <button class="btn" id="btn-save-edit" type="submit">Save changes</button>
+            <button class="btn ghost" id="btn-delete" type="button">Delete subscriber</button>
+          </div>
+        </form>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:14px 0">
+
+        <h3>Record consumption — enter quantities for any type (save once)</h3>
+        <form id="form-consume">
+          <div class="row">
+            <div class="col"><label>Chicken consumed</label><input id="use_chicken" type="number" min="0" value="0"></div>
+            <div class="col"><label>Beef consumed</label><input id="use_beef" type="number" min="0" value="0"></div>
+            <div class="col"><label>Fish consumed</label><input id="use_fish" type="number" min="0" value="0"></div>
+          </div>
+          <div class="row">
+            <div class="col"><label>Snack consumed</label><input id="use_snack" type="number" min="0" value="0"></div>
+            <div class="col"><label>Other consumed</label><input id="use_other" type="number" min="0" value="0"></div>
+            <div class="col"><label>&nbsp;</label><div style="height:40px"></div></div>
+          </div>
+          <div class="controls">
+            <button class="btn" type="submit">Save usage</button>
+            <button class="btn ghost" id="btn-clear-usage" type="button">Clear</button>
+          </div>
+        </form>
+
+        <div id="after_msg" class="small muted" style="margin-top:12px"></div>
+      </div>
+
+      <div id="notfound" class="card hidden" style="margin-top:12px;background:transparent;border:1px dashed rgba(255,255,255,0.03)">
+        <div class="muted">No subscriber loaded. Use search to find a subscriber by name, phone or ID, then edit or record consumption.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- IMPORT / EXPORT -->
+  <section id="page-import" class="page">
+    <div class="card">
+      <h2>Import / Export CSV</h2>
+      <p class="small muted">CSV columns: key,name,id,phone,plan,duration,start,meals_chicken,meals_beef,meals_fish,meals_snack,meals_other,protein</p>
+
+      <div class="row">
+        <div class="col"><button class="btn" id="btn-export-all">Export all subscribers (CSV)</button></div>
+        <div class="col">
+          <label>Import CSV file</label>
+          <input id="import_file" type="file" accept=".csv,text/csv">
+        </div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="btn-import">Import selected file</button>
+        <button class="btn ghost" id="btn-clear-all">Clear all data</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEAR EXPIRY -->
+  <section id="page-near" class="page">
+    <div class="card">
+      <h2>Near-expiry subscribers</h2>
+      <p class="small muted">Subscribers with ≤ 5 days left OR ≤ 5 total meals left. Auto-refreshes once per day.</p>
+      <div class="controls" style="margin-top:8px">
+        <button class="btn" id="btn-export-near">Download CSV (near)</button>
+        <button class="btn ghost" id="btn-refresh-near">Refresh now</button>
+      </div>
+
+      <table id="near_table" style="margin-top:12px">
+        <thead><tr><th>Name</th><th>ID</th><th>Phone</th><th>Plan</th><th>Days left</th><th>Total meals</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- VIEW ALL -->
+  <section id="page-view" class="page">
+    <div class="card">
+      <h2>All subscribers</h2>
+      <div class="topbar">
+        <input id="view_q" type="text" placeholder="Filter by name, id or phone" style="flex:1;padding:10px;border-radius:8px;background:#07111a;color:#eaf8f7;border:1px solid rgba(255,255,255,0.03)">
+        <button class="btn" id="btn-refresh-view">Refresh</button>
+      </div>
+
+      <table id="view_table">
+        <thead><tr><th>Name</th><th>ID</th><th>Phone</th><th>Plan</th><th>Start</th><th>Duration</th><th>Meals left</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="note">Tip: after adding, go to "Find Subscriber" and type their name/ID/phone to edit or record consumption.</footer>
+</main>
+
+<nav id="mainNav">
+  <button data-page="page-add" class="active">Add</button>
+  <button data-page="page-edit-consume">Find / Edit</button>
+  <button data-page="page-import">Import/Export</button>
+  <button data-page="page-near">Near Expiry</button>
+  <button data-page="page-view">View</button>
+</nav>
+
+<script>
+/* -----------------------
+   IndexedDB helper
+   ----------------------- */
+const DB_NAME = 'subs_db_v1';
+const STORE = 'subs';
+let db;
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const r = indexedDB.open(DB_NAME,1);
+    r.onupgradeneeded = e => {
+      const d = e.target.result;
+      if(!d.objectStoreNames.contains(STORE)){
+        const s = d.createObjectStore(STORE,{keyPath:'key'});
+        s.createIndex('name','name',{unique:false});
+        s.createIndex('id','id',{unique:false});
+        s.createIndex('phone','phone',{unique:false});
+      }
+    };
+    r.onsuccess = e => { db = e.target.result; resolve(db); };
+    r.onerror = e => reject(e.target.error);
+  });
+}
+function txPromise(mode, fn){
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(STORE, mode);
+    const st = tx.objectStore(STORE);
+    try {
+      fn(st);
+      tx.oncomplete = ()=>res();
+      tx.onerror = e => rej(e.target.error);
+    } catch(err){ rej(err); }
+  });
+}
+function putSub(sub){
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(STORE,'readwrite');
+    const st = tx.objectStore(STORE);
+    st.put(sub).onsuccess = ()=>res(sub);
+    tx.onerror = e => rej(e.target.error);
+  });
+}
+function getAllSubs(){
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(STORE,'readonly');
+    const st = tx.objectStore(STORE);
+    const r = st.getAll();
+    r.onsuccess = ()=>res(r.result);
+    r.onerror = e => rej(e.target.error);
+  });
+}
+function getByKey(k){
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(STORE,'readonly');
+    const st = tx.objectStore(STORE);
+    const r = st.get(k);
+    r.onsuccess = ()=>res(r.result);
+    r.onerror = e => rej(e.target.error);
+  });
+}
+function deleteKey(k){
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(STORE,'readwrite');
+    const st = tx.objectStore(STORE);
+    const r = st.delete(k);
+    r.onsuccess = ()=>res();
+    r.onerror = e => rej(e.target.error);
+  });
+}
+
+/* -----------------------
+   Utilities
+   ----------------------- */
+function uid(){ return crypto.randomUUID ? crypto.randomUUID() : 'k_'+Math.random().toString(36).slice(2,9); }
+function daysLeft(sub){
+  if(!sub.start) return null;
+  const s = new Date(sub.start);
+  const end = new Date(s);
+  end.setDate(end.getDate() + Number(sub.duration));
+  return Math.ceil((end - new Date())/(1000*60*60*24));
+}
+function totalMeals(sub){
+  return Number(sub.meals_chicken||0) + Number(sub.meals_beef||0) + Number(sub.meals_fish||0) + Number(sub.meals_snack||0) + Number(sub.meals_other||0);
+}
+function toCSV(rows){
+  if(!rows || !rows.length) return '';
+  const keys = Object.keys(rows[0]);
+  const lines = [keys.join(',')];
+  for(const r of rows){
+    lines.push(keys.map(k => `"${((r[k]===undefined||r[k]===null)?'': String(r[k])).replace(/\"/g,'""')}"`).join(','));
+  }
+  return lines.join('\n');
+}
+function downloadBlob(text, filename){
+  const blob = new Blob([text],{type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+/* -----------------------
+   UI: navigation
+   ----------------------- */
+const navButtons = document.querySelectorAll('nav button');
+navButtons.forEach(b=>{
+  b.addEventListener('click', ()=> {
+    navButtons.forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    const page = b.dataset.page;
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(page).classList.add('active');
+  });
+});
+
+/* -----------------------
+   Add subscriber
+   ----------------------- */
+document.getElementById('form-add').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const sub = {
+    key: 'sub_'+uid(),
+    name: document.getElementById('add_name').value.trim(),
+    id: document.getElementById('add_id').value.trim(),
+    phone: document.getElementById('add_phone').value.trim(),
+    plan: document.getElementById('add_plan').value.trim(),
+    duration: Number(document.getElementById('add_duration').value),
+    start: document.getElementById('add_start').value || new Date().toISOString().split('T')[0],
+    meals_chicken: Number(document.getElementById('add_chicken').value||0),
+    meals_beef: Number(document.getElementById('add_beef').value||0),
+    meals_fish: Number(document.getElementById('add_fish').value||0),
+    meals_snack: Number(document.getElementById('add_snack').value||0),
+    meals_other: Number(document.getElementById('add_other').value||0),
+    protein: Number(document.getElementById('add_protein').value||0)
+  };
+  await putSub(sub);
+  alert('Subscriber added');
+  e.target.reset();
+  refreshAll();
+});
+
+/* -----------------------
+   Find / Edit / Delete
+   ----------------------- */
+const foundBox = document.getElementById('found_box');
+const notfound = document.getElementById('notfound');
+const foundInfo = document.getElementById('found_info');
+
+document.getElementById('btn-search').addEventListener('click', async ()=>{
+  await doSearch();
+});
+document.getElementById('search_q').addEventListener('keydown', async (e)=>{
+  if(e.key === 'Enter'){ e.preventDefault(); await doSearch(); }
+});
+
+async function doSearch(){
+  const q = document.getElementById('search_q').value.trim().toLowerCase();
+  if(!q){ alert('Type name, phone or ID to search'); return; }
+  const all = await getAllSubs();
+  const sub = all.find(s => (s.name||'').toLowerCase().includes(q) || (s.phone||'').toLowerCase().includes(q) || (s.id||'').toLowerCase() === q );
+  if(!sub){
+    foundBox.classList.add('hidden');
+    notfound.classList.remove('hidden');
+    return;
+  }
+  notfound.classList.add('hidden');
+  foundBox.classList.remove('hidden');
+  showFound(sub);
+}
+
+function showFound(sub){
+  // fill info summary
+  const meals = totalMeals(sub);
+  const days = daysLeft(sub);
+  foundInfo.innerHTML = `<strong>${sub.name}</strong> — ID: ${sub.id} — Phone: ${sub.phone || '-'}<br>
+    <span class="small">Plan: ${sub.plan || '-'} | Start: ${sub.start || '-'} | Duration: ${sub.duration} days</span><br>
+    <span class="small">Meals left: ${meals} | Days left: ${days !== null ? days : '-'}</span>`;
+
+  // fill edit form
+  document.getElementById('edit_key').value = sub.key;
+  document.getElementById('edit_name').value = sub.name || '';
+  document.getElementById('edit_id').value = sub.id || '';
+  document.getElementById('edit_phone').value = sub.phone || '';
+  document.getElementById('edit_plan').value = sub.plan || '';
+  document.getElementById('edit_duration').value = sub.duration || 14;
+  document.getElementById('edit_start').value = sub.start || '';
+  document.getElementById('edit_chicken').value = sub.meals_chicken || 0;
+  document.getElementById('edit_beef').value = sub.meals_beef || 0;
+  document.getElementById('edit_fish').value = sub.meals_fish || 0;
+  document.getElementById('edit_snack').value = sub.meals_snack || 0;
+  document.getElementById('edit_other').value = sub.meals_other || 0;
+  document.getElementById('edit_protein').value = sub.protein || 0;
+
+  // reset usage inputs
+  document.getElementById('use_chicken').value = 0;
+  document.getElementById('use_beef').value = 0;
+  document.getElementById('use_fish').value = 0;
+  document.getElementById('use_snack').value = 0;
+  document.getElementById('use_other').value = 0;
+}
+
+/* Save edit */
+document.getElementById('form-edit').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const key = document.getElementById('edit_key').value;
+  if(!key) return alert('Load a subscriber first');
+  const sub = await getByKey(key);
+  if(!sub) return alert('Not found');
+  sub.name = document.getElementById('edit_name').value.trim();
+  sub.id = document.getElementById('edit_id').value.trim();
+  sub.phone = document.getElementById('edit_phone').value.trim();
+  sub.plan = document.getElementById('edit_plan').value.trim();
+  sub.duration = Number(document.getElementById('edit_duration').value);
+  sub.start = document.getElementById('edit_start').value || sub.start;
+  sub.meals_chicken = Number(document.getElementById('edit_chicken').value||0);
+  sub.meals_beef = Number(document.getElementById('edit_beef').value||0);
+  sub.meals_fish = Number(document.getElementById('edit_fish').value||0);
+  sub.meals_snack = Number(document.getElementById('edit_snack').value||0);
+  sub.meals_other = Number(document.getElementById('edit_other').value||0);
+  sub.protein = Number(document.getElementById('edit_protein').value||0);
+  await putSub(sub);
+  alert('Saved');
+  showFound(sub);
+  refreshAll();
+});
+
+/* Delete */
+document.getElementById('btn-delete').addEventListener('click', async ()=>{
+  const key = document.getElementById('edit_key').value;
+  if(!key) return alert('Load a subscriber first');
+  if(!confirm('Delete subscriber?')) return;
+  await deleteKey(key);
+  alert('Deleted');
+  document.getElementById('form-edit').reset();
+  foundBox.classList.add('hidden');
+  notfound.classList.remove('hidden');
+  refreshAll();
+});
+
+/* -----------------------
+   Record consumption (all types at once)
+   ----------------------- */
+document.getElementById('form-consume').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const key = document.getElementById('edit_key').value;
+  if(!key) return alert('Load a subscriber first');
+  const sub = await getByKey(key);
+  if(!sub) return alert('Not found');
+
+  const usage = {
+    meals_chicken: Number(document.getElementById('use_chicken').value || 0),
+    meals_beef: Number(document.getElementById('use_beef').value || 0),
+    meals_fish: Number(document.getElementById('use_fish').value || 0),
+    meals_snack: Number(document.getElementById('use_snack').value || 0),
+    meals_other: Number(document.getElementById('use_other').value || 0)
+  };
+
+  // check insufficiency per type
+  const insufficient = [];
+  if(usage.meals_chicken > (sub.meals_chicken||0)) insufficient.push('Chicken');
+  if(usage.meals_beef > (sub.meals_beef||0)) insufficient.push('Beef');
+  if(usage.meals_fish > (sub.meals_fish||0)) insufficient.push('Fish');
+  if(usage.meals_snack > (sub.meals_snack||0)) insufficient.push('Snack');
+  if(usage.meals_other > (sub.meals_other||0)) insufficient.push('Other');
+  if(insufficient.length) return alert('Not enough: ' + insufficient.join(', '));
+
+  // apply usage
+  sub.meals_chicken = Math.max(0, (sub.meals_chicken||0) - usage.meals_chicken);
+  sub.meals_beef = Math.max(0, (sub.meals_beef||0) - usage.meals_beef);
+  sub.meals_fish = Math.max(0, (sub.meals_fish||0) - usage.meals_fish);
+  sub.meals_snack = Math.max(0, (sub.meals_snack||0) - usage.meals_snack);
+  sub.meals_other = Math.max(0, (sub.meals_other||0) - usage.meals_other);
+
+  await putSub(sub);
+
+  // build detailed message
+  const usedParts = [];
+  if(usage.meals_chicken) usedParts.push(`Chicken: ${usage.meals_chicken}`);
+  if(usage.meals_beef) usedParts.push(`Beef: ${usage.meals_beef}`);
+  if(usage.meals_fish) usedParts.push(`Fish: ${usage.meals_fish}`);
+  if(usage.meals_snack) usedParts.push(`Snack: ${usage.meals_snack}`);
+  if(usage.meals_other) usedParts.push(`Other: ${usage.meals_other}`);
+  const usedSummary = usedParts.length ? usedParts.join(', ') : 'Nothing';
+
+  const mealsLeft = totalMeals(sub);
+  const days = daysLeft(sub);
+
+  document.getElementById('after_msg').textContent = `✅ Usage recorded — ${usedSummary}. Remaining ${mealsLeft} meals, ${days} days left.`;
+  // update shown info
+  showFound(sub);
+  refreshAll();
+});
+
+/* clear usage */
+document.getElementById('btn-clear-usage').addEventListener('click', ()=>{
+  document.getElementById('use_chicken').value = 0;
+  document.getElementById('use_beef').value = 0;
+  document.getElementById('use_fish').value = 0;
+  document.getElementById('use_snack').value = 0;
+  document.getElementById('use_other').value = 0;
+});
+
+/* -----------------------
+   Import / Export logic
+   ----------------------- */
+document.getElementById('btn-export-all').addEventListener('click', async ()=>{
+  const all = await getAllSubs();
+  if(!all.length) return alert('No data to export');
+  downloadBlob(toCSV(all), 'subscribers.csv');
+});
+
+document.getElementById('btn-import').addEventListener('click', ()=>{
+  const f = document.getElementById('import_file').files[0];
+  if(!f) return alert('Choose a CSV file first');
+  const r = new FileReader();
+  r.onload = async e => {
+    const txt = e.target.result;
+    const lines = txt.split(/\r?\n/).filter(l=>l.trim());
+    if(!lines.length) return alert('Empty file');
+    const header = lines.shift().split(',').map(h => h.replace(/^"|"$/g,''));
+    const arr = lines.map(l=>{
+      const cols = l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,''));
+      const obj = {};
+      header.forEach((k,i)=> obj[k] = cols[i] || '');
+      if(!obj.key) obj.key = 'sub_'+uid();
+      obj.duration = Number(obj.duration || 14);
+      obj.meals_chicken = Number(obj.meals_chicken || 0);
+      obj.meals_beef = Number(obj.meals_beef || 0);
+      obj.meals_fish = Number(obj.meals_fish || 0);
+      obj.meals_snack = Number(obj.meals_snack || 0);
+      obj.meals_other = Number(obj.meals_other || 0);
+      obj.protein = Number(obj.protein || 0);
+      return obj;
+    });
+    for(const s of arr) await putSub(s);
+    alert('Imported ' + arr.length + ' rows');
+    refreshAll();
+  };
+  r.readAsText(f);
+});
+
+/* clear DB (danger) */
+document.getElementById('btn-clear-all').addEventListener('click', async ()=>{
+  if(!confirm('Delete ALL subscribers? This cannot be undone.')) return;
+  const all = await getAllSubs();
+  for(const s of all) await deleteKey(s.key);
+  alert('All cleared');
+  refreshAll();
+});
+
+/* -----------------------
+   Near expiry logic
+   ----------------------- */
+async function computeNear(){
+  const all = await getAllSubs();
+  const near = all.filter(s=>{
+    const d = daysLeft(s);
+    const m = totalMeals(s);
+    return (d !== null && d <= 5) || (m <= 5);
+  });
+  localStorage.setItem('near_snapshot', JSON.stringify(near));
+  populateNear(near);
+}
+function populateNear(list){
+  const tbody = document.querySelector('#near_table tbody');
+  tbody.innerHTML = list.map(s=>`<tr>
+    <td>${s.name}</td><td>${s.id}</td><td>${s.phone || '-'}</td><td>${s.plan || '-'}</td><td>${daysLeft(s)}</td><td>${totalMeals(s)}</td>
+  </tr>`).join('');
+}
+document.getElementById('btn-refresh-near').addEventListener('click', ()=>computeNear());
+document.getElementById('btn-export-near').addEventListener('click', ()=>{
+  const data = JSON.parse(localStorage.getItem('near_snapshot') || '[]');
+  if(!data.length) return alert('No near-expiry data');
+  downloadBlob(toCSV(data), 'near_expiry.csv');
+});
+
+/* -----------------------
+   View all
+   ----------------------- */
+document.getElementById('btn-refresh-view').addEventListener('click', ()=>refreshAll());
+document.getElementById('view_q').addEventListener('input', e => refreshView(e.target.value.trim().toLowerCase()));
+
+async function refreshView(q){
+  const all = await getAllSubs();
+  const list = q ? all.filter(s => (s.name||'').toLowerCase().includes(q) || (s.id||'').toLowerCase().includes(q) || (s.phone||'').toLowerCase().includes(q)) : all;
+  const tbody = document.querySelector('#view_table tbody');
+  tbody.innerHTML = list.map(s=>`<tr>
+    <td>${s.name}</td><td>${s.id}</td><td>${s.phone || '-'}</td><td>${s.plan || '-'}</td><td>${s.start || '-'}</td><td>${s.duration}</td><td>${totalMeals(s)}</td>
+  </tr>`).join('');
+}
+
+/* -----------------------
+   Initialization & daily near update
+   ----------------------- */
+async function refreshAll(){
+  await refreshView('');
+  await computeNear();
+}
+function dailyNearUpdate(){
+  const last = localStorage.getItem('near_last_date');
+  const today = new Date().toDateString();
+  if(last !== today){
+    computeNear();
+    localStorage.setItem('near_last_date', today);
+  } else {
+    const snap = JSON.parse(localStorage.getItem('near_snapshot') || '[]');
+    populateNear(snap);
+  }
+}
+
+/* -----------------------
+   Service Worker & manifest (simple inline blobs)
+   ----------------------- */
+if('serviceWorker' in navigator){
+  const swCode = `
+  self.addEventListener('install', e => {
+    self.skipWaiting();
+    e.waitUntil(caches.open('subs-app-v1').then(c => c.addAll(['./'])));
+  });
+  self.addEventListener('fetch', e => {
+    e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+  });`;
+  const blob = new Blob([swCode], {type:'application/javascript'});
+  const url = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(url).then(()=>console.log('sw registered')).catch(()=>{});
+}
+
+/* dynamic manifest for installability */
+(function(){
+  const manifest = {
+    name: "Subscription Manager (Dark)",
+    short_name: "SubsMgr",
+    start_url: ".",
+    display: "standalone",
+    background_color: "#07101a",
+    theme_color: "#0ea5a4",
+    icons: [
+      { src: "icon-192.png", sizes: "192x192", type: "image/png" },
+      { src: "icon-512.png", sizes: "512x512", type: "image/png" }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = url;
+  document.head.appendChild(link);
+})();
+
+/* -----------------------
+   On load: open DB + init UI
+   ----------------------- */
+openDB().then(()=>{
+  refreshAll();
+  dailyNearUpdate();
+}).catch(err=>{ console.error(err); alert('DB error: '+err); });
+
+/* quick helpers: allow pressing Enter in search to trigger action */
+document.getElementById('search_q').addEventListener('input', ()=>{
+  document.getElementById('notfound')?.classList.remove('hidden');
+});
+</script>
+</body>
+</html>
